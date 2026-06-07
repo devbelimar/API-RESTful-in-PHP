@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Completa - PHP Puro</title>
+    <style>
+        body { 
+            font-family: 'poppins'; 
+            max-width: 700px; 
+            margin: 30px auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 { color: #333; margin-top: 0; }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-get { background: #2196F3; }
+        .btn-post { background: #4CAF50; }
+        .btn-put { background: #FF9800; }
+        .btn-delete { background: #f44336; }
+        
+        input { 
+            padding: 10px; 
+            margin: 5px; 
+            width: 180px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #resultado { 
+            background: #263238; 
+            color: #aed581;
+            padding: 15px; 
+            margin-top: 20px; 
+            border-radius: 5px; 
+            font-family: monospace;
+            min-height: 100px;
+        }
+        .section { margin: 10px 0; }
+        label { display: inline-block; width: 80px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🚀 API Completa com PHP Puro</h1>
+    <p>GET | POST | PUT | DELETE</p>
+
+    <!-- ========== GET ========== -->
+    <div class="card">
+        <h2>📖 GET - Buscar Dados</h2>
+        <div class="section">
+            <button class="btn-get" onclick="buscarTodos()">Buscar Todos</button>
+        </div>
+        <div class="section">
+            <label>ID:</label>
+            <input type="number" id="getId" placeholder="Ex: 1">
+            <button class="btn-get" onclick="buscarUm()">Buscar por ID</button>
+        </div>
+    </div>
+
+    <!-- ========== POST ========== -->
+    <div class="card">
+        <h2>➕ POST - Criar Novo</h2>
+        <div class="section">
+            <label>Nome:</label>
+            <input type="text" id="postNome" placeholder="Ex: Ana">
+        </div>
+        <div class="section">
+            <label>Email:</label>
+            <input type="email" id="postEmail" placeholder="Ex: ana@email.com">
+        </div>
+        <button class="btn-post" onclick="criar()">Criar Utilizador</button>
+    </div>
+
+    <!-- ========== PUT ========== -->
+    <div class="card">
+        <h2>✏️ PUT - Atualizar</h2>
+        <div class="section">
+            <label>ID:</label>
+            <input type="number" id="putId" placeholder="ID a atualizar">
+        </div>
+        <div class="section">
+            <label>Nome:</label>
+            <input type="text" id="putNome" placeholder="Novo nome (opcional)">
+        </div>
+        <div class="section">
+            <label>Email:</label>
+            <input type="email" id="putEmail" placeholder="Novo email (opcional)">
+        </div>
+        <button class="btn-put" onclick="atualizar()">Atualizar Utilizador</button>
+    </div>
+
+    <!-- ========== DELETE ========== -->
+    <div class="card">
+        <h2>🗑️ DELETE - Apagar</h2>
+        <div class="section">
+            <label>ID:</label>
+            <input type="number" id="deleteId" placeholder="ID a apagar">
+            <button class="btn-delete" onclick="apagar()">Apagar Utilizador</button>
+        </div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultado">
+        <strong>📡 Resposta da API:</strong>
+        <pre id="output">Clique num botão para ver a resposta...</pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost/projeto/api.php';
+
+        // ========== GET ==========
+        async function buscarTodos() {
+            try {
+                const resposta = await fetch(API_URL);
+                const dados = await resposta.json();
+                mostrarResultado('GET /api.php', dados);
+            } catch (erro) {
+                mostrarResultado('GET /api.php', { erro: erro.message });
+            }
+        }
+
+        async function buscarUm() {
+            const id = document.getElementById('getId').value;
+            if (!id) {
+                mostrarResultado('GET /api.php?id=' + id, { erro: 'Digite um ID!' });
+                return;
+            }
+            
+            try {
+                const resposta = await fetch(`${API_URL}?id=${id}`);
+                const dados = await resposta.json();
+                mostrarResultado(`GET /api.php?id=${id}`, dados);
+            } catch (erro) {
+                mostrarResultado(`GET /api.php?id=${id}`, { erro: erro.message });
+            }
+        }
+
+        // ========== POST ==========
+        async function criar() {
+            const nome = document.getElementById('postNome').value;
+            const email = document.getElementById('postEmail').value;
+
+            if (!nome || !email) {
+                mostrarResultado('POST /api.php', { erro: 'Preencha nome e email!' });
+                return;
+            }
+
+            try {
+                const resposta = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email })
+                });
+                const dados = await resposta.json();
+                mostrarResultado('POST /api.php', dados);
+            } catch (erro) {
+                mostrarResultado('POST /api.php', { erro: erro.message });
+            }
+        }
+
+        // ========== PUT ==========
+        async function atualizar() {
+            const id = document.getElementById('putId').value;
+            const nome = document.getElementById('putNome').value;
+            const email = document.getElementById('putEmail').value;
+
+            if (!id) {
+                mostrarResultado('PUT /api.php', { erro: 'ID é obrigatório!' });
+                return;
+            }
+
+            const dadosEnviar = { id: parseInt(id) };
+            if (nome) dadosEnviar.nome = nome;
+            if (email) dadosEnviar.email = email;
+
+            try {
+                const resposta = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosEnviar)
+                });
+                const dados = await resposta.json();
+                mostrarResultado('PUT /api.php', dados);
+            } catch (erro) {
+                mostrarResultado('PUT /api.php', { erro: erro.message });
+            }
+        }
+
+        // ========== DELETE ==========
+        async function apagar() {
+            const id = document.getElementById('deleteId').value;
+
+            if (!id) {
+                mostrarResultado('DELETE /api.php', { erro: 'ID é obrigatório!' });
+                return;
+            }
+
+            try {
+                const resposta = await fetch(API_URL, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: parseInt(id) })
+                });
+                const dados = await resposta.json();
+                mostrarResultado('DELETE /api.php', dados);
+            } catch (erro) {
+                mostrarResultado('DELETE /api.php', { erro: erro.message });
+            }
+        }
+
+        // ========== Mostrar Resultado ==========
+        function mostrarResultado(requisicao, dados) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            output.textContent = `[${timestamp}] 
+            ${requisicao} ${JSON.stringify(dados, null, 2)}`;
+        }
+    </script>
+</body>
+</html>
