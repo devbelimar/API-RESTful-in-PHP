@@ -81,7 +81,7 @@ switch($method):
         
         if(empty($nome) || empty($email)):
             $response['status'] = 'error';
-            $response['message'] = 'Nome e são obrigatórios';
+            $response['message'] = 'Nome e Email são obrigatórios';
         else:
             $novoId = end($users)['id'] + 1;
             $novoUser = [
@@ -132,6 +132,7 @@ switch($method):
 
     case 'DELETE':
         $id = $input['id'] ?? null;
+        
         if(!$id):
             $response['status'] = 'error';
             $response['message'] = 'ID é obrigatório para apagar';
